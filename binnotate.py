@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# binnotate v0.01
+
 import binwalk
 import string
 import argparse, os
@@ -53,6 +55,7 @@ single_tag_template = string.Template("""\t\t<TAG id="${tag_id}">
 """)
 
 '''
+# Generic .tags file looks like this:
 <?xml version="1.0" encoding="UTF-8"?>
 <wxHexEditor_XML_TAG>
   <filename path="C:\Applications\testtag.tags">
@@ -86,7 +89,7 @@ note_colour = [	"#FCA0FF", # pastel pink
 colours_len = len(note_colour)
 
 
-# requires capstone
+# requires capstone, will probably hang or fail if it's not installed properly
 if args.do_disasm:
 	print("Using --disasm against the file")
 	for disasms in binwalk.scan('--disasm', file):
@@ -101,7 +104,7 @@ if args.do_disasm:
 				all_tags += single_tag_template.substitute(	tag_id=this_id, 
 															tag_start_offset=result.offset, 
 															tag_end_offset=end_offset, 
-															tag_text=escape(result.description + " " + size_note), 
+															tag_text=escape(hex(result.offset) + ": " + result.description + " " + size_note), 
 															tag_font_colour=font_colour, 
 															tag_note_colour=note_colour[this_id%colours_len] )
 				this_id += 1
@@ -123,7 +126,7 @@ if args.do_opcodes:
 				all_tags += single_tag_template.substitute(	tag_id=this_id, 
 															tag_start_offset=result.offset, 
 															tag_end_offset=end_offset, 
-															tag_text=escape(result.description + " " + size_note), 
+															tag_text=escape(hex(result.offset) + ": " + result.description + " " + size_note), 
 															tag_font_colour=font_colour, 
 															tag_note_colour=note_colour[this_id%colours_len] )
 				this_id += 1
@@ -142,7 +145,7 @@ for signature in binwalk.scan('--signature', file):
 			all_tags += single_tag_template.substitute(	tag_id=this_id, 
 														tag_start_offset=result.offset, 
 														tag_end_offset=end_offset, 
-														tag_text=escape(result.description + " " + size_note), 
+														tag_text=escape(hex(result.offset) + ": " + result.description + " " + size_note), 
 														tag_font_colour=font_colour, 
 														tag_note_colour=note_colour[this_id%colours_len] )
 			this_id += 1
